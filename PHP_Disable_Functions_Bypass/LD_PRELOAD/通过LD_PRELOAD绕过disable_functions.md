@@ -227,7 +227,7 @@ error_log("a",1);
 **可以使用的函数**
 
 ```
-mail("aa@qq.com","","","","")
+mail("aa@qq.com","","","","-bv")   //-bv是不真正发送邮件
 error_log("a",1)
 $img = new Imagick('xx.wmv')
 imap_mail('1@2','2@3','222','','')
@@ -306,6 +306,10 @@ bypass.php?cmd=pwd&outpath=/tmp/xx&sopath=/var/www/bypass_disablefunc_x64.so
 
 
 
+
+
+
+
 ## 0x04 参考链接
 
 https://www.anquanke.com/post/id/175403
@@ -313,3 +317,5 @@ https://www.anquanke.com/post/id/175403
 https://www.smi1e.top/php-bypass-disabled_functions/
 
 https://github.com/yangyangwithgnu/bypass_disablefunc_via_LD_PRELOAD
+
+https://www.tr0y.wang/2018/04/18/PHPDisalbedfunc/index.html
