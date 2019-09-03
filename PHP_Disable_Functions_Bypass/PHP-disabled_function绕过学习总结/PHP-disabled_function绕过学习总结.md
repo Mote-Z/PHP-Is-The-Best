@@ -216,7 +216,7 @@ PHP 时才能工作，且该函数不适用于 Windows 系统。
 
 ### 方法二：LD_PRELOAD
 
-
+详见LD_PRELOAD
 
 
 
